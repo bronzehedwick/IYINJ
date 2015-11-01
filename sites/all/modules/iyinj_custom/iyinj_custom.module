@@ -1,0 +1,481 @@
+<?php
+
+/**
+ * @file iyinj_custom.module
+ * Custom functionality for IYI NJ site.
+ */
+
+/**
+ * Implements Hook Menu.
+ */
+
+function iyinj_custom_menu() {
+  $menuitems['classes'] = array(
+    'title' => 'Classes',
+    'page callback' => 'iyinj_custom_classes_callback',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $menuitems;
+}
+
+/**
+ * Classes callback.
+ */
+
+function iyinj_custom_classes_callback() {
+  $nodes = node_load_multiple(array(), array('type' => 'class', 'status' => 1));
+  $classes = array('SU' => array(), 'MO' => array(), 'TU' => array(), 'WE' => array(), 'TH' => array(), 'FR' => array(), 'SA' => array());
+  $day_keys = array('SU' => 'Sunday', 'MO' => 'Monday', 'TU' => 'Tuesday', 'WE' => 'Wednesday', 'TH' => 'Thursday', 'FR' => 'Friday', 'SA' => 'Saturday');
+  $outputs = array(
+    'SU' => '<div class="class-day first odd sunday"><h3 class="day-title">Sunday</h3>',
+    'MO' => '<div class="class-day even monday"><h3 class="day-title">Monday</h3>',
+    'TU' => '<div class="class-day odd tuesday"><h3 class="day-title">Tuesday</h3>',
+    'WE' => '<div class="class-day even wednesday"><h3 class="day-title">Wednesday</h3>',
+    'TH' => '<div class="class-day odd thursday"><h3 class="day-title">Thursday</h3>',
+    'FR' => '<div class="class-day even friday"><h3 class="day-title">Friday</h3>',
+    'SA' => '<div class="class-day last odd saturday"><h3 class="day-title">Saturday</h3>'
+  );
+
+  foreach ($nodes as $node) {
+    foreach ($node->field_day['und'][0]['value'] as $day) {
+      $classes[$day][] = array(
+        'title' => $node->title,
+        'time' => $node->field_time['und'][0]['value'],
+        'nid' => $node->nid
+      );
+    }
+  }
+
+  foreach ($classes as $day => $class) {
+    if (count($class) > 1) {
+      usort($classes[$day], function($a, $b) {
+        return to_military_time($a['time']) - to_military_time($b['time']);
+      });
+    }
+  }
+
+  foreach($classes as $day => $class_set) {
+    $index = 1;
+
+    foreach ($class_set as $class) {
+      $outputs[$day] .= '
+        <div class="class-set">
+        <span class="class-title">' . l($class['title'], 'node/' . $class['nid']) . '</span> -
+        <span class="time"> ' . $class['time'] . '</span></div>';
+
+      if ($index >= count($class_set)) {
+        $outputs[$day] .= '</div>';
+      }
+
+      $index++;
+    }
+
+  }
+
+  return join($outputs);
+}
+
+/**
+ * Utility function to convert 12 hour time to 24 hour.
+ */
+
+function to_military_time($time) {
+  $PM = strpos($time, 'PM');
+  $half_hour = (strpos($time, '30') > 1 ?  .5 : 0);
+  $first_hour = (strpos($time, '12') === 0 ? TRUE : FALSE);
+
+  if ($first_hour) {
+    return ((int)$time - 12) + $half_hour;
+  } elseif ($PM) {
+    return ((int)$time + 12) + $half_hour;
+  }
+
+  return (int)$time + $half_hour;
+}
+
+/**
+ * Declare what blocks are provided by this module.
+ * Implements hook_block_info().
+ */
+
+function iyinj_custom_block_info() {
+  $block['iyinj_custom_front'] = array(
+    'info' => t('IYI NJ Custom Front'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $block;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+
+function iyinj_custom_block_view($delta = '') {
+  switch($delta) {
+    case 'iyinj_custom_front':
+      if (user_access('access content')) {
+         $block['subject'] = t('');
+         $block['content'] = iyinj_custom_front_items();
+
+         return $block;
+      }
+
+      break;
+  }
+}
+
+/**
+ * Items for the front page block.
+ */
+
+function iyinj_custom_front_items() {
+  $items = array();
+
+  // Capture the image file path and form into HTML with attributes
+  $image_file = file_load(variable_get('front_image_fid', ''));
+  $image_path = '';
+
+  if (isset($image_file->uri)) {
+    $image_path = $image_file->uri;
+    $image_path = image_style_url('huge', $image_path);
+  }
+
+  $image = theme_image(array(
+    'path' => ($image_path),
+    'alt' => t('Front page image.'),
+    'title' => t('Front page image.'),
+    'attributes' => array('class' => 'front-image'),
+  ));
+
+  $items['front_image'] = array(
+    'image' => array(
+      '#prefix' => '<div class="front-image-wrapper">',
+      '#type' => 'markup',
+      '#markup' => $image,
+      '#suffix' => '</div>'
+    )
+  );
+
+  $triptych = array();
+
+  $triptych_one_image = file_load(variable_get('triptych_one_image_fid', ''));
+  $triptych_two_image = file_load(variable_get('triptych_two_image_fid', ''));
+  $triptych_three_image = file_load(variable_get('triptych_three_image_fid', ''));
+
+  if (isset($triptych_one_image->uri)) {
+    $triptych_one_image_path = image_style_url('large', $triptych_one_image->uri);
+  }
+
+  if (isset($triptych_two_image->uri)) {
+    $triptych_two_image_path = image_style_url('large', $triptych_two_image->uri);
+  }
+
+  if (isset($triptych_three_image->uri)) {
+    $triptych_three_image_path = image_style_url('large', $triptych_three_image->uri);
+  }
+
+  $triptych[] = array(
+    'title' => variable_get('triptych_one_title_var', ''),
+    'class' => 'triptych-one',
+    'link' => url(variable_get('triptych_one_link_var', '')),
+    'description' => variable_get('triptych_one_description_var', ''),
+    'image' => $triptych_one_image_path
+  );
+
+  $triptych[] = array(
+    'title' => variable_get('triptych_two_title_var', ''),
+    'class' => 'triptych-two',
+    'link' => url(variable_get('triptych_two_link_var', '')),
+    'description' => variable_get('triptych_two_description_var', ''),
+    'image' => $triptych_two_image_path
+  );
+
+  $triptych[] = array(
+    'title' => variable_get('triptych_three_title_var', ''),
+    'class' => 'triptych-three',
+    'link' => url(variable_get('triptych_three_link_var', '')),
+    'description' => variable_get('triptych_three_description_var', ''),
+    'image' => $triptych_three_image_path
+  );
+
+  $items['triptych'] = $triptych;
+
+  return theme('iyinj_custom_front_items', array('items' => $items));
+}
+
+/**
+ * Implements hook_theme().
+ */
+
+function iyinj_custom_theme() {
+  $module_path = drupal_get_path('module', 'iyinj_custom');
+  $base = array(
+    'path' => "$module_path/theme",
+  );
+
+  return array(
+    'iyinj_custom_front_items' => $base + array(
+      'template' => 'iyinj_custom_block',
+      'variables' => array('items' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+
+function iyinj_custom_block_configure($delta='') {
+  $form = array();
+
+  switch($delta) {
+    case 'iyinj_custom_front' :
+
+      // Main front page image upload
+
+      $form['front_image'] = array(
+        '#name' => 'front_image',
+        '#type' => 'managed_file',
+        '#title' => t('Main front page image'),
+        '#description' => t('Select an Image for the main front page display.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
+        '#default_value' => variable_get('front_image_fid', ''),
+        '#upload_location' => 'public://front_image/',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('gif png jpg jpeg'),
+        ),
+      );
+
+      // Triptych grouping
+
+      $form['triptych'] = array(
+        '#type' => 'vertical_tabs'
+      );
+
+      $form['triptych_one_fieldset'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Triptych 1'),
+        '#collapsible' => TRUE,
+        '#description' => t('Edit settings for the first front page triptych.'),
+        '#group' => 'triptych'
+      );
+
+      $form['triptych_two_fieldset'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Triptych 2'),
+        '#collapsible' => TRUE,
+        '#description' => t('Edit settings for the second front page triptych.'),
+        '#group' => 'triptych'
+      );
+
+      $form['triptych_three_fieldset'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Triptych 3'),
+        '#collapsible' => TRUE,
+        '#description' => t('Edit settings for the third front page triptych.'),
+        '#group' => 'triptych'
+      );
+
+      // Triptych 1
+
+      $form['triptych_one_fieldset']['triptych_one_title'] = array(
+        '#name' => 'triptych_one_title',
+        '#type' => 'textfield',
+        '#title' => t('Title'),
+        '#description' => t('Enter your title for the first triptych.'),
+        '#default_value' => variable_get('triptych_one_title_var', '')
+      );
+
+      $form['triptych_one_fieldset']['triptych_one_link'] = array(
+        '#name' => 'triptych_one_link',
+        '#type' => 'textfield',
+        '#title' => t('Link'),
+        '#description'=> t('Add a link, excluding the http://www/iyinj.org/ part.'),
+        '#default_value' => variable_get('triptych_one_link_var', '')
+      );
+
+      $form['triptych_one_fieldset']['triptych_one_description'] = array(
+        '#name' => 'triptych_one_description',
+        '#type' => 'textarea',
+        '#title' => t('Description'),
+        '#description'=> t('Enter your description for the first triptych.'),
+        '#default_value' => variable_get('triptych_one_description_var', '')
+      );
+
+      $form['triptych_one_fieldset']['triptych_one_image'] = array(
+        '#name' => 'front_image',
+        '#type' => 'managed_file',
+        '#title' => t('Image'),
+        '#description' => t('Select an Image for the first triptych.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
+        '#default_value' => variable_get('triptych_one_image_fid', ''),
+        '#upload_location' => 'public://triptych_one_image/',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('gif png jpg jpeg'),
+        ),
+      );
+
+      // Triptych 2
+
+      $form['triptych_two_fieldset']['triptych_two_title'] = array(
+        '#name' => 'triptych_two_title',
+        '#type' => 'textfield',
+        '#title' => t('Title'),
+        '#description' => t('Enter your title for the first triptych.'),
+        '#default_value' => variable_get('triptych_two_title_var', '')
+      );
+
+      $form['triptych_two_fieldset']['triptych_two_link'] = array(
+        '#name' => 'triptych_two_link',
+        '#type' => 'textfield',
+        '#title' => t('Link'),
+        '#description'=> t('Add a link, excluding the http://www/iyinj.org/ part.'),
+        '#default_value' => variable_get('triptych_two_link_var', '')
+      );
+
+      $form['triptych_two_fieldset']['triptych_two_description'] = array(
+        '#name' => 'triptych_two_description',
+        '#type' => 'textarea',
+        '#title' => t('Description'),
+        '#description'=> t('Enter your description for the first triptych.'),
+        '#default_value' => variable_get('triptych_two_description_var', '')
+      );
+
+      $form['triptych_two_fieldset']['triptych_two_image'] = array(
+        '#name' => 'front_image',
+        '#type' => 'managed_file',
+        '#title' => t('Image'),
+        '#description' => t('Select an Image for the second triptych.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
+        '#default_value' => variable_get('triptych_two_image_fid', ''),
+        '#upload_location' => 'public://triptych_two_image/',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('gif png jpg jpeg'),
+        ),
+      );
+
+      // Triptych 3
+
+      $form['triptych_three_fieldset']['triptych_three_title'] = array(
+        '#name' => 'triptych_three_title',
+        '#type' => 'textfield',
+        '#title' => t('Title'),
+        '#description' => t('Enter your title for the third triptych.'),
+        '#default_value' => variable_get('triptych_three_title_var', '')
+      );
+
+      $form['triptych_three_fieldset']['triptych_three_link'] = array(
+        '#name' => 'triptych_three_link',
+        '#type' => 'textfield',
+        '#title' => t('Link'),
+        '#description'=> t('Add a link, excluding the http://www/iyinj.org/ part.'),
+        '#default_value' => variable_get('triptych_three_link_var', '')
+      );
+
+      $form['triptych_three_fieldset']['triptych_three_description'] = array(
+        '#name' => 'triptych_three_description',
+        '#type' => 'textarea',
+        '#title' => t('Description'),
+        '#description'=> t('Enter your description for the first triptych.'),
+        '#default_value' => variable_get('triptych_three_description_var', '')
+      );
+
+      $form['triptych_three_fieldset']['triptych_three_image'] = array(
+        '#name' => 'front_image',
+        '#type' => 'managed_file',
+        '#title' => t('Image'),
+        '#description' => t('Select an Image for the first triptych.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
+        '#default_value' => variable_get('triptych_three_image_fid', ''),
+        '#upload_location' => 'public://triptych_three_image/',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('gif png jpg jpeg'),
+        ),
+      );
+
+      break;
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+
+function iyinj_custom_block_save($delta = '', $edit = array()) {
+  switch($delta) {
+    case 'iyinj_custom_front' :
+      // Saving the main image file, setting it to a permanent state, setting a FID variable
+      $file = file_load($edit['front_image']);
+      $file->status = FILE_STATUS_PERMANENT;
+      file_save($file);
+      $block = block_load('iyinj_custom', $delta);
+      file_usage_add($file, 'iyinj_custom', 'block', $block->bid);
+      variable_set('front_image_fid', $file->fid);
+
+      // Saving Triptych 1
+      if (!empty($edit['triptych_one_title'])) {
+        variable_set('triptych_one_title_var', $edit['triptych_one_title']);
+      }
+
+      if (!empty($edit['triptych_one_link'])) {
+        variable_set('triptych_one_link_var', $edit['triptych_one_link']);
+      }
+
+      if (!empty($edit['triptych_one_description'])) {
+        variable_set('triptych_one_description_var', $edit['triptych_one_description']);
+      }
+
+      if (!empty($edit['triptych_one_image'])) {
+        $triptych_one_file = file_load($edit['triptych_one_image']);
+        $triptych_one_file->status = FILE_STATUS_PERMANENT;
+        file_save($triptych_one_file);
+        file_usage_add($triptych_one_file, 'iyinj_custom', 'block', $block->bid);
+        variable_set('triptych_one_image_fid', $triptych_one_file->fid);
+      }
+
+      // Saving Triptych 2
+      if (!empty($edit['triptych_two_title'])) {
+        variable_set('triptych_two_title_var', $edit['triptych_two_title']);
+      }
+
+      if (!empty($edit['triptych_two_link'])) {
+        variable_set('triptych_two_link_var', $edit['triptych_two_link']);
+      }
+
+      if (!empty($edit['triptych_two_description'])) {
+        variable_set('triptych_two_description_var', $edit['triptych_two_description']);
+      }
+
+      if (!empty($edit['triptych_two_image'])) {
+        $triptych_two_file = file_load($edit['triptych_two_image']);
+        $triptych_two_file->status = FILE_STATUS_PERMANENT;
+        file_save($triptych_two_file);
+        file_usage_add($triptych_two_file, 'iyinj_custom', 'block', $block->bid);
+        variable_set('triptych_two_image_fid', $triptych_two_file->fid);
+      }
+
+      // Saving Triptych 3
+      if (!empty($edit['triptych_three_title'])) {
+        variable_set('triptych_three_title_var', $edit['triptych_three_title']);
+      }
+
+      if (!empty($edit['triptych_three_link'])) {
+        variable_set('triptych_three_link_var', $edit['triptych_three_link']);
+      }
+
+      if (!empty($edit['triptych_three_description'])) {
+        variable_set('triptych_three_description_var', $edit['triptych_three_description']);
+      }
+
+      if (!empty($edit['triptych_three_image'])) {
+        $triptych_three_file = file_load($edit['triptych_three_image']);
+        $triptych_three_file->status = FILE_STATUS_PERMANENT;
+        file_save($triptych_three_file);
+        file_usage_add($triptych_three_file, 'iyinj_custom', 'block', $block->bid);
+        variable_set('triptych_three_image_fid', $triptych_three_file->fid);
+      }
+
+      break;
+  }
+}

@@ -1,0 +1,6 @@
+name = IYI NJ Custom
+description = Custom functionality for the IYI NJ site
+package = Custom
+core = 7.x
+php = 5.2
+files[] = iyinj_custom.module
