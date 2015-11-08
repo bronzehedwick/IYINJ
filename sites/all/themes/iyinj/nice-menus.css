@@ -38,7 +38,10 @@
   color: #C05505;
 }
 
-.nice-menu-main-menu li ul li a:link {
+.nice-menu-main-menu li ul li a:link,
+.nice-menu-main-menu li ul li a:visited,
+.nice-menu-main-menu li ul li a:focus,
+.nice-menu-main-menu li ul li a:active {
   color: #f3f3f3;
 }
 
