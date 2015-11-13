@@ -1805,32 +1805,28 @@ a:hover {
 }
 
 /**
- * Navigation
+ * Logo image
  */
 /* line 20, ../sass/_iyinj.scss */
-#navigation {
-  margin: 20px 0;
-}
-/* line 23, ../sass/_iyinj.scss */
-#navigation .active-trail {
-  color: #c05505;
+.header__logo-image {
+  width: 100%;
 }
 
 /**
  * Classes
  */
-/* line 32, ../sass/_iyinj.scss */
+/* line 28, ../sass/_iyinj.scss */
 .class-day {
   width: 125px;
   padding: 0 10px;
   min-height: 300px;
   float: left;
 }
-/* line 38, ../sass/_iyinj.scss */
+/* line 34, ../sass/_iyinj.scss */
 .class-day.even {
   background-color: #eee;
 }
-/* line 42, ../sass/_iyinj.scss */
+/* line 38, ../sass/_iyinj.scss */
 .class-day .class-set {
   margin-bottom: 10px;
 }
@@ -1838,27 +1834,27 @@ a:hover {
 /**
  * Bios
  */
-/* line 52, ../sass/_iyinj.scss */
+/* line 48, ../sass/_iyinj.scss */
 #block-views-bios-block .views-row {
   margin-bottom: 20px;
 }
-/* line 56, ../sass/_iyinj.scss */
+/* line 52, ../sass/_iyinj.scss */
 #block-views-bios-block .views-row .views-field-field-image img {
   border-radius: 50%;
 }
 @media screen and (min-width: 830px) {
-  /* line 63, ../sass/_iyinj.scss */
+  /* line 59, ../sass/_iyinj.scss */
   #block-views-bios-block .views-row {
     height: 250px;
     clear: left;
   }
-  /* line 67, ../sass/_iyinj.scss */
+  /* line 63, ../sass/_iyinj.scss */
   #block-views-bios-block .views-row .views-field-field-image {
     float: left;
     margin-right: 20px;
     width: 220px;
   }
-  /* line 73, ../sass/_iyinj.scss */
+  /* line 69, ../sass/_iyinj.scss */
   #block-views-bios-block .views-row .views-field-title {
     position: relative;
     top: 35px;
@@ -1868,20 +1864,20 @@ a:hover {
 /**
  * Front page block
  */
-/* line 86, ../sass/_iyinj.scss */
+/* line 82, ../sass/_iyinj.scss */
 #block-iyinj-custom-iyinj-custom-front .front-image-wrapper {
   overflow: hidden;
 }
-/* line 89, ../sass/_iyinj.scss */
+/* line 85, ../sass/_iyinj.scss */
 #block-iyinj-custom-iyinj-custom-front .front-image-wrapper .front-image {
   width: 100%;
 }
-/* line 94, ../sass/_iyinj.scss */
+/* line 90, ../sass/_iyinj.scss */
 #block-iyinj-custom-iyinj-custom-front .front-image-wrapper,
 #block-iyinj-custom-iyinj-custom-front .triptych {
   margin-top: 30px;
 }
-/* line 99, ../sass/_iyinj.scss */
+/* line 95, ../sass/_iyinj.scss */
 #block-iyinj-custom-iyinj-custom-front .triptych-item {
   height: 200px;
   margin-bottom: 15px;
@@ -1889,7 +1885,7 @@ a:hover {
   background-position: center center;
   background-size: cover;
 }
-/* line 107, ../sass/_iyinj.scss */
+/* line 103, ../sass/_iyinj.scss */
 #block-iyinj-custom-iyinj-custom-front .overlay-wrap {
   height: 180px;
   width: 38%;
@@ -1898,22 +1894,22 @@ a:hover {
   background-color: rgba(0, 0, 0, 0.5);
   color: #fff;
 }
-/* line 115, ../sass/_iyinj.scss */
+/* line 111, ../sass/_iyinj.scss */
 #block-iyinj-custom-iyinj-custom-front .overlay-wrap h3 {
   margin-top: 0;
 }
 @media screen and (min-width: 830px) {
-  /* line 121, ../sass/_iyinj.scss */
+  /* line 117, ../sass/_iyinj.scss */
   #block-iyinj-custom-iyinj-custom-front .front-image-wrapper {
     height: 400px;
   }
-  /* line 125, ../sass/_iyinj.scss */
+  /* line 121, ../sass/_iyinj.scss */
   #block-iyinj-custom-iyinj-custom-front .triptych-item {
     width: 33%;
     float: left;
     margin-right: 0.5%;
   }
-  /* line 131, ../sass/_iyinj.scss */
+  /* line 127, ../sass/_iyinj.scss */
   #block-iyinj-custom-iyinj-custom-front .triptych-three {
     margin-right: 0;
   }
@@ -1922,27 +1918,27 @@ a:hover {
 /**
  * Footer
  */
-/* line 141, ../sass/_iyinj.scss */
+/* line 137, ../sass/_iyinj.scss */
 #footer {
   margin-top: 50px;
   padding: 50px;
   background-color: #eee;
 }
-/* line 146, ../sass/_iyinj.scss */
+/* line 142, ../sass/_iyinj.scss */
 #footer h2 {
   font-size: 1em;
 }
 @media screen and (min-width: 830px) {
-  /* line 151, ../sass/_iyinj.scss */
+  /* line 147, ../sass/_iyinj.scss */
   #footer .block {
     float: left;
   }
-  /* line 154, ../sass/_iyinj.scss */
+  /* line 150, ../sass/_iyinj.scss */
   #footer .block.first {
     width: 33%;
     margin-right: 33%;
   }
-  /* line 159, ../sass/_iyinj.scss */
+  /* line 155, ../sass/_iyinj.scss */
   #footer .block.last {
     width: 33%;
   }
