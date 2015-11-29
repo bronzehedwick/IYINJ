@@ -138,6 +138,36 @@ blockquote {
 }
 
 /**
+ * Special news
+ */
+
+#block-views-special-news-block {
+  .view {
+    background-color: $primary-color;
+    padding: 30px;
+  }
+
+  .views-row {
+    display: inline-block;
+    width: 32%;
+  }
+
+  .views-row-2 {
+    text-align: center;
+  }
+
+  .views-row-3 {
+    text-align: right;
+  }
+
+  a:link,
+  a:active,
+  a:visited {
+    color: #fff;
+  }
+}
+
+/**
  * Footer
  */
 
