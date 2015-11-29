@@ -39,12 +39,14 @@ function iyinj_custom_classes_callback() {
   );
 
   foreach ($nodes as $node) {
-    foreach ($node->field_day['und'][0]['value'] as $day) {
-      $classes[$day][] = array(
-        'title' => $node->title,
-        'time' => $node->field_time['und'][0]['value'],
-        'nid' => $node->nid
-      );
+    if (!empty($node->field_day)) {
+      foreach ($node->field_day['und'][0]['value'] as $day) {
+        $classes[$day][] = array(
+          'title' => $node->title,
+          'time' => $node->field_time['und'][0]['value'],
+          'nid' => $node->nid
+        );
+      }
     }
   }
 
