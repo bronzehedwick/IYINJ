@@ -18,6 +18,7 @@ robots.txt
 sites/all/README.txt
 sites/all/modules/README.txt
 sites/all/themes/README.txt
+sites/default
 
 # Ignore everything but the "sites" folder ( for non core developer )
 .htaccess
@@ -34,3 +35,7 @@ xmlrpc.php
 /profiles
 /scripts
 /themes
+
+# Ignore Misc and hostgator stuff
+.ftpquota
+error_log
